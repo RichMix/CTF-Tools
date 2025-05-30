@@ -200,12 +200,16 @@ We will focus on using and processing the logs with a hands-on approach in this 
 In addition to Linux command-line tools, one auxiliary program called zeek-cut reduces the effort of extracting specific columns from log files. 
 Each log file provides "field names" in the beginning. This information will help you while using zeek-cut. Make sure that you use the "fields" and not the "types".
 
-Tool/Auxilary Name	Purpose
-Zeek-cut	Cut specific columns from zeek logs.
-Let's see the "zeek-cut" in action. Let's extract the uid, protocol, source and destination hosts, and source and destination ports from the conn.log. 
+| Tool/Auxilary Name | Purpose |
+|--------------------|---------|
+| Zeek-cut | Cut specific columns from zeek logs.|
+
+Let's see the "zeek-cut" in action. 
+Let's extract the uid, protocol, source and destination hosts, and source and destination ports from the conn.log. 
+
 We will first read the logs with the cat command and then extract the event of interest fields with zeek-cut auxiliary to compare the difference.
 
-zeek
+### zeek
 -cut usage example
 root@ubuntu$ cat conn.log 
 ...
