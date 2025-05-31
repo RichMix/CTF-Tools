@@ -70,12 +70,12 @@ Although main functions are identical, some of the features are much stronger fo
 | Feature | NetworkMiner | Wireshark |
 |---------|--------------|-----------|
 | Purpose |	Quick overview, traffic mapping, and data extraction | In-Depth analysis |
-| GUI	✅ | ✅ |
+| GUI |	✅ | ✅ |
 | Sniffing | ✅ | ✅ |
 | Handling PCAPS | ✅ | ✅ |
 | OS Fingerprinting |	✅ | ❌ |
 | Parameter/Keyword Discovery |	✅ | Manual |
-| Credential Discovery	✅ | ✅ |
+| Credential Discovery |	✅ | ✅ |
 | File Extraction |	✅ | ✅ |
 | Filtering Options |	Limited | ✅ | 
 | Packet Decoding |	Limited | ✅ |
