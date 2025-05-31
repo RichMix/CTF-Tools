@@ -73,10 +73,10 @@ Although main functions are identical, some of the features are much stronger fo
 | GUI	✅ | ✅ |
 | Sniffing | ✅ | ✅ |
 | Handling PCAPS | ✅ | ✅ |
-| OS Fingerprinting	✅ | ❌ |
+| OS Fingerprinting |	✅ | ❌ |
 | Parameter/Keyword Discovery |	✅ | Manual |
 | Credential Discovery	✅ | ✅ |
-| File Extraction	✅ | ✅ |
+| File Extraction |	✅ | ✅ |
 | Filtering Options |	Limited | ✅ | 
 | Packet Decoding |	Limited | ✅ |
 | Protocol Analysis	| ❌ | ✅ |
