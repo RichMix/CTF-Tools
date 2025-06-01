@@ -42,9 +42,7 @@ SYN → SYN/ACK → ACK → RST/ACK, or
 SYN → RST/ACK
 
 Filter to surface candidates
-
-wireshark
-tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.window_size > 1024
+#### tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.window_size > 1024
 
 2. TCP SYN (Half-Open) Scan (nmap -sS)
 Nature : handshake not completed (root only).
@@ -59,8 +57,8 @@ Closed : SYN → RST/ACK
 
 Filter to surface candidates
 
-wireshark
-tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.window_size <= 1024
+#### tcp.flags.syn == 1 && tcp.flags.ack == 0 && tcp.window_size <= 1024
+
 3. UDP Scan (nmap -sU)
 Nature : no handshake; open ports stay silent.
 
@@ -68,8 +66,41 @@ Closed-port clue : ICMP Destination Unreachable, Port Unreachable
 (Type 3, Code 3), which embeds the original UDP probe.
 
 Filter to catch closed-port replies
+#### icmp.type == 3 && icmp.code == 3
 
-wireshark
-icmp.type == 3 && icmp.code == 3
-Tip: Expand the ICMP packet’s data section to view the encapsulated UDP header and pinpoint which probe triggered the error.
+
+### Tip: Expand the ICMP packet’s data section to view the encapsulated UDP header and pinpoint which probe triggered the error.
+
+flowchart TD
+    %% ---  CAPTURE & FILTER  ---
+    A[PCAP / Live Capture] --> B[Filter ARP packets<br/>`arp`]
+
+    %% ---  BASIC CLASSIFICATION  ---
+    B --> C{Opcode?}
+    C -->|1 = Request| D[Broadcast ARP request<br/>(Normal)]
+    C -->|2 = Reply| E[Unicast ARP reply]
+
+    %% ---  DUPLICATE-IP CHECK  ---
+    E --> F{Duplicate IP-MAC<br/>detected?}
+    F -->|Yes| G[⚠ Possible ARP spoof<br/>`arp.duplicate-address-*`]
+    F -->|No| H[No conflict]
+
+    %% ---  NULL MAC CHECK  ---
+    B --> I[dst MAC = 00:00:00:00:00:00?<br/>`arp.dst.hw_mac == 00:00:00:00:00:00`]
+    I -->|True| G
+
+    %% ---  FLOODING CHECK  ---
+    B --> J[Count ARP requests per MAC]
+    J --> K{Rate > normal?}
+    K -->|Yes| L[⚠ Possible ARP flood]
+
+    %% ---  CORRELATE & IDENTIFY  ---
+    G --> M[Correlate IP ↔ MAC pairs<br/>Build mapping table]
+    L --> M
+    H --> M
+
+    %% ---  CROSS-PROTOCOL VALIDATION  ---
+    M --> N[Inspect upper-layer traffic<br/>(e.g., HTTP dst MAC ≠ gateway)]
+    N --> O[🎯 Confirm MITM / Attacker MAC]
+
 
