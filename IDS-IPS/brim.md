@@ -131,3 +131,51 @@ flowchart TD
 
     %% ─ OUTPUT
     K & L & M --> Z[📋 Consolidated Findings]
+
+1 Malware C2 Detection — CobaltStrike Campaign
+Workflow (Mermaid)
+mermaid
+
+flowchart TD
+    A[Import pcap] --> B[Enumerate log types]
+    B --> C[List top host pairs<br/>`cut id.orig_h,id.resp_h…`]
+    C --> D[Spot odd subnets<br/>10.22.x / 104.168.x]
+    D --> E[List services & ports<br/>`conn | cut id.resp_p,service …`]
+    E --> F[DNS volume check<br/>`dns | count() by query`]
+    F --> G[Enrich suspicious FQDN/IP on VirusTotal]
+    G --> H[HTTP review<br/>`http | cut … host,uri`]
+    H --> I[Confirm file download & VT “CobaltStrike” hit]
+    I --> J[Correlate Suricata alerts<br/>`event_type=="alert" …`]
+    J --> Z[✍️ Report C2 IPs, payload URL, alert counts]
+Key Brim Queries
+Objective	Query
+Frequent peers	`cut id.orig_h,id.resp_p,id.resp_h
+Service / port tally	`_path=="conn"
+Heavy DNS talkers	`_path=="dns"
+HTTP downloads	`_path=="http"
+Suricata roll-up	`event_type=="alert"
+
+Pivot tips:
+Any new IP/FQDN uncovered → VT/ThreatFox check → feed back as Brim filter (id.resp_h==X.X.X.X).
+
+2 Crypto-Mining Detection — Coin-Miner Traffic
+Workflow (Mermaid)
+
+flowchart TD
+    A[Import pcap] --> B[Top host pairs<br/>`uniq -c`]
+    B --> C[Flag talkative host 192.168.x.x]
+    C --> D[View port spread<br/>`conn | cut id.resp_p`]
+    D --> E[Size-on-wire check<br/>`put total_bytes:=…`]
+    E --> F[Suricata alert sweep<br/>`event_type=="alert"`]
+    F --> G[Identify “Crypto Currency Mining” category]
+    G --> H[List all conns for miner host<br/>`conn | 192.168.1.100`]
+    H --> I[External VT lookup of pool IP]
+    I --> J[Extract mapped MITRE techniques<br/>`alert.metadata.mitre_*`]
+    J --> Z[✍️ Report pool, host, T1496 mapping]
+Key Brim Queries
+Objective	Query
+Frequent peers	`cut id.orig_h,id.resp_p,id.resp_h
+Port anomalies	`_path=="conn"
+Biggest flows	`_path=="conn"
+Suricata summary	`event_type=="alert"
+MITRE mapping	`event_type=="alert"
