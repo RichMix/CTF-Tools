@@ -102,3 +102,32 @@ Brim has 12 premade queries listed under the "Brim" folder. These queries help u
 You can add new queries by clicking on the "+" button near the "Queries" menu.
 
 
+%% ---------- BRIM INVESTIGATION WORKFLOW ----------
+flowchart TD
+    A[Ingest Zeek / Suricata logs<br/>(_path==*)] --> B[Communicated hosts<br/>`conn | cut id.orig_h,id.resp_h | uniq`]
+
+    %% ─ Communicated Hosts
+    B --> C[Frequently-talking pairs<br/>`… | uniq -c | sort -r`]
+
+    %% ─ Service / Port Focus
+    C --> D[Most-active ports<br/>`conn | cut id.resp_p,service | uniq -c | sort -r`]
+    D --> E[Long connections<br/>`conn | sort -r duration`]
+
+    %% ─ Data Volume
+    E --> F[Big transfers<br/>`put total_bytes := orig_bytes+resp_bytes | sort -r total_bytes`]
+
+    %% ─ Name / Content Intel
+    B --> G[DNS top queries<br/>`dns | count() by query | sort -r`]
+    B --> H[HTTP top URIs<br/>`http | count() by uri | sort -r`]
+    B --> I[Suspicious hostnames<br/>`dhcp | cut host_name,domain`]
+    C --> J[Class-net outliers<br/>`put classnet:=network_of(id.resp_h)…`]
+
+    %% ─ File & SMB
+    F --> K[Transferred files<br/>`filename != null`]
+    B --> L[SMB activity<br/>`dce_rpc OR smb_mapping OR smb_files`]
+
+    %% ─ Alerts / Notices
+    A --> M[Known-pattern alerts<br/>`event_type=="alert" OR _path=="notice" OR _path=="signatures"`]
+
+    %% ─ OUTPUT
+    K & L & M --> Z[📋 Consolidated Findings]
