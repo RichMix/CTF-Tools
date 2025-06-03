@@ -335,7 +335,7 @@ Field mode	Turns TShark into a CSV/JSON exporter → perfect for `sort 
 Tip: Prefer hex + regex when ASCII might be encoded or obfuscated.
 
 
-
+Reference https://www.jalblas.com/blog/thm-tshark-challenge-1-teamwork-walkthrough/
 
 
 
